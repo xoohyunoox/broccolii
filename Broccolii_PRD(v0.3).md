@@ -166,27 +166,39 @@ Management track onboarding inputs:
 ### 7.4 건강검진 Data (Adult)
 | Feature | Details |
 |---|---|
-| Live API sync | Connect to Korean health data infrastructure to pull 국민건강보험 건강검진 results directly — no PDF required *(research in progress — see Open Questions)* |
-| PDF upload fallback | If live API is unavailable or user prefers, upload PDF for Claude to extract results |
+| Live API sync | Connect to 건강보험공단 via **Tilko (틸코블렛)** API to pull 건강검진 results directly — no PDF download required |
+| Auth flow | User authenticates via **간편인증**: enters name + date of birth + phone number, then taps "허용" in KakaoTalk — a clear in-app animated guide will walk users through the 3 steps to reduce drop-off |
+| PDF upload fallback | If user cannot complete 간편인증 or prefers not to, they can upload a 건강검진 PDF for Claude to extract results |
 | AI extraction | Claude reads data and extracts key values (혈당, 콜레스테롤, 혈압, BMI, 요산, 간수치 등) |
 | AI analysis | Identifies problems, areas for improvement, and health trends across multiple check-up years |
 | Results display | Clean summary card per checkup year |
 | Multi-year trend | Key values charted across checkup years |
 | AI nudge | Realistic, science-backed nudges with progressive knowledge depth |
 
-> **Research required:** Identify the most viable API pathway for Korean 건강검진 data (CODEF, 틸코블렛, 공공데이터포털, or other). Assess barriers users face in accessing their own data. This finding will determine whether live API stays in MVP or is deferred.
+**API strategy:**
+- **MVP:** Tilko — pay-per-call (~330 KRW per pull), no monthly minimum, supports 간편인증 via KakaoTalk. Estimated cost at 1,000 active users: ~330,000 KRW/month.
+- **Long-term (v1.x):** Migrate to **건강정보고속도로 (마이헬스웨이)** — the government-sanctioned, legally clean platform. Covers all health data including hospital EMR records. Begin partner approval process during MVP phase; approval takes several months.
+
+**Privacy & legal (required before launch):**
+- 건강검진 data is classified as **민감정보** under 개인정보보호법 제23조. A separate, explicit consent screen for health data is legally required — distinct from the standard privacy policy.
+- Engage a Korean privacy lawyer before launch to draft compliant 개인정보 처리방침 and 민감정보 동의서.
+- All health data must be encrypted at rest on the server.
+- A user data deletion flow must be built from day one (right to erasure).
+- Document the 위탁 (processing delegation) relationship with Tilko in writing.
 
 ### 7.5 Children's Health Data (Parent-Managed)
 | Feature | Details |
 |---|---|
 | Child sub-profiles | Parent creates profiles (name, DOB, sex) — no child login |
-| 영유아검진 | Data pull via 본인인증 or PDF upload → AI extraction of growth metrics and developmental results |
-| 학생건강검진 | Data pull via 본인인증 or PDF upload → AI extraction of height, weight, vision, dental, blood results |
-| 예방접종 이력 | Data pull via 본인인증 or manual entry |
+| 영유아검진 | Data pull via **parent's 간편인증** (child is registered as a dependent under parent's 건강보험) or PDF upload → AI extraction of growth metrics and developmental results |
+| 학생건강검진 | Data pull via **parent's 간편인증** or PDF upload → AI extraction of height, weight, vision, dental, blood results |
+| 예방접종 이력 | Data pull via **parent's 간편인증** (from 질병관리청 예방접종도우미 via Tilko) or manual entry |
 | Parent view | Read-only summary cards for each child, accessible from parent's home screen |
 | Growth chart | Height and weight plotted over time per child |
 
-> **Research required:** Identify the most viable way for parents to pull their children's health data via 본인인증. Assess potential barriers (API access, parental consent flows, data availability). This finding will determine the UX approach for MVP.
+**API approach:** Tilko supports 영유아검진 and 예방접종 APIs. Since children under 14 are registered as 피부양자 under the parent's 건강보험 account, the parent's 간편인증 should be sufficient to pull child data — **confirm this flow directly with Tilko before building.**
+
+**Privacy note:** Processing health data for children under 14 requires verified parental consent under 개인정보보호법. The parent account holder is the legal consent authority for their child's data in Broccolii.
 
 ### 7.6 Sleep (Deprioritized)
 | Feature | Details |
@@ -243,7 +255,8 @@ Management track onboarding inputs:
 | Backend & database | Supabase | Managed Postgres + auth + storage; generous free tier |
 | AI feedback & knowledge | Anthropic Claude API (claude-sonnet-4) | Nudge generation, progressive knowledge depth, PDF extraction |
 | PDF parsing | Claude vision via API | Reads 건강검진 / 영유아검진 PDFs |
-| Health data API | TBD — research in progress | Live sync of Korean 건강검진 and children's health data |
+| Health data API (MVP) | Tilko (틸코블렛) | Pay-per-call (~330 KRW), no monthly minimum, supports 간편인증, covers 건강검진 + 예방접종 + 영유아검진 |
+| Health data API (future) | 건강정보고속도로 (마이헬스웨이) | Government-sanctioned platform; begin partner approval during MVP phase |
 | Auth | Supabase phone auth (OTP) | Simple, no social accounts required |
 | Font | Pretendard | Optimized for Korean elderly readability |
 | Charts | Victory Native | Lightweight, React Native compatible |
@@ -312,9 +325,11 @@ Management track onboarding inputs:
 
 ## 12. Open Questions
 
-- [ ] **Health check-up API:** Which API provider is most viable for Korean 건강검진 data? What barriers do users face in accessing their own data? *(Research in progress)*
-- [ ] **Children's health data access:** What is the most viable way for parents to pull children's health data via 본인인증? Are there consent or regulatory barriers? *(Research in progress)*
+- [x] **Health check-up API:** Tilko selected for MVP; 건강정보고속도로 as long-term path. Begin partner approval process during MVP phase.
+- [ ] **Children's data via Tilko:** Confirm directly with Tilko that parent's 간편인증 can pull 영유아검진/학생검진/예방접종 for children registered as 피부양자. If not supported, fall back to PDF-only for MVP.
+- [ ] **Average chart data source:** Identify a publicized Korean dataset for glucose and uric acid population averages (e.g., 국민건강영양조사 data from 질병관리청). If not available, use published medical reference ranges.
 - [ ] **Community forum:** Is a community forum viable for a future version? What moderation and infrastructure would it require?
+- [ ] **Privacy lawyer:** Engage a Korean privacy lawyer before launch to draft compliant 민감정보 동의서 and 개인정보 처리방침.
 
 ---
 
