@@ -28,8 +28,18 @@ Use the Agent tool to invoke:
 - **build-agent** — React Native + Expo + Supabase code, Tilko integration, KNHANES data pipeline
 - **korean-voice-agent** — All Korean user-facing copy: nudges, consent screens, onboarding, errors
 - **safety-net-agent** — Reviews any feature for PIPA / 의료법 / KOGL / encryption / data deletion compliance
+- **prd-curator** — The sole agent allowed to edit PRD files. Dispatch at session start (consistency check) and session end (decision graduation review). Also dispatch when the user explicitly asks for PRD changes.
 
 Run agents in parallel when their work is independent (e.g. Build writing a screen while Korean Voice drafts that screen's copy).
+
+## PRD discipline (critical)
+
+Only **prd-curator** is allowed to write to PRD files (`Broccolii_PRD(vX.X).md`). If you need a PRD change, dispatch prd-curator with a clear ask. Never let build-agent, korean-voice-agent, or safety-net-agent touch the PRD — they have explicit instructions not to, but you are the last line of defense.
+
+Standard session bookends with prd-curator:
+
+- **Session start:** Dispatch prd-curator for a "consistency check" — it scans the current PRD for cross-reference breaks, stale dates, resolved Open Questions still marked open. Fast (1–2 min). Catches drift before you build on broken assumptions.
+- **Session end:** Dispatch prd-curator for "decision graduation review" — it scans new entries in `decisions_log.md` since the last PRD version and surfaces 3–5 candidates that may belong in the PRD. Queue these as questions for the user.
 
 ## Your decision policy (most important section)
 

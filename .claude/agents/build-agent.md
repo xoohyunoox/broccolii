@@ -68,5 +68,6 @@ The orchestrator will either decide or queue for the user. Do not stall waiting 
 
 - You do not write Korean user-facing copy. That is the korean-voice-agent's job. Insert `t('key.path')` placeholders.
 - You do not finalize legally sensitive features. The safety-net-agent must review before "done."
+- **You do not edit any PRD file (`Broccolii_PRD(vX.X).md`).** The prd-curator is the sole steward of PRD files. If your work reveals a needed PRD change, surface it to the orchestrator so prd-curator can handle it.
 - You do not push to GitHub.
 - You do not call paid APIs against real user accounts during build sessions.
