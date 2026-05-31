@@ -1,6 +1,9 @@
 export type BiologicalSex = 'male' | 'female';
 export type MealContext = 'fasting' | 'pre_meal' | 'post_meal_1h' | 'post_meal_2h';
 
+// Shape matches @supabase/postgrest-js GenericSchema so the typed client
+// can statically infer Insert / Update / Row shapes. Each table must declare
+// Row, Insert, Update, Relationships — even if Relationships is [].
 export interface Database {
   public: {
     Tables: {
@@ -23,6 +26,7 @@ export interface Database {
           date_of_birth?: string;
           sex?: BiologicalSex;
         };
+        Relationships: [];
       };
       glucose_logs: {
         Row: {
@@ -44,11 +48,15 @@ export interface Database {
           meal_context?: MealContext;
           logged_at?: string;
         };
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
     Enums: {
       biological_sex: BiologicalSex;
       meal_context: MealContext;
     };
+    CompositeTypes: Record<string, never>;
   };
 }

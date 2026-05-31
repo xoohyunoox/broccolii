@@ -38,6 +38,34 @@ Questions that need your input. The orchestrator queued these because they are *
 
 ## Open
 
+### Final wording of 4 glucose nudges (Level 0–1, one per meal context)
+
+**Status:** 🟡 PROVISIONAL
+
+**Question:** PRD §15 "To Be Decided" lists nudge wording as user-decision. The orchestrator drafted 4 working nudges in `lib/glucose.ts` (`GLUCOSE_NUDGES`) — one each for 공복 / 식전 / 식후 1시간 / 식후 2시간. Should korean-voice-agent draft alternatives for you to choose from, or are these acceptable as v0?
+
+**Why it matters:** These are the first words the user sees after every glucose log — sets tone for the whole app. PRD voice (§5.1 nudge-don't-alarm; §5.3 Level 0–1 default) is explicit, so this is a "tone refinement" question, not a strategic redirect.
+
+**Provisional assumption:** Ship the orchestrator's working draft into builds; queue korean-voice-agent for refinement before MVP launch.
+
+**Currently blocking:** Nothing — easy file swap once finalized.
+
+**Logged:** 2026-05-31 by orchestrator.
+
+### Onboarding-as-blocking-step pattern (forced first-run gate)
+
+**Status:** 🟡 PROVISIONAL
+
+**Question:** The new `0002_profile_trigger.sql` auto-creates a profiles row with placeholder values (empty name, DOB 1990-01-01, sex 'male') the moment a user signs up via OTP. To avoid showing those defaults anywhere, onboarding must be a forced blocking step before tabs are reachable. Confirm this pattern?
+
+**Why it matters:** Affects routing architecture — onboarding lives at the root stack above `(tabs)`, not as a tab. Two-way door but cleaner to commit now.
+
+**Provisional assumption:** Next session, build-agent will scaffold onboarding as a separate stack screen that the root layout gates on (profile.name === '' || profile.date_of_birth === '1990-01-01').
+
+**Currently blocking:** Auth/onboarding work in the next session.
+
+**Logged:** 2026-05-31 by orchestrator.
+
 ### ✅ ANSWERED — Pretendard font file source & license confirmation
 
 **Status:** ✅ ANSWERED
